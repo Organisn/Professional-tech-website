@@ -187,7 +187,12 @@ function applyLanguage(language) {
   document.querySelectorAll('[data-bs-toggle="popover"]').forEach((element) => {
     const key = element.dataset.i18nPop;
     if (key && translations[selectedLanguage][key]) {
-      element.setAttribute('data-bs-content', translations[selectedLanguage][key]);
+      const content = translations[selectedLanguage][key];
+      element.setAttribute('data-bs-content', content);
+      const popover = bootstrap.Popover.getInstance(element);
+      if (popover) {
+        popover.setContent({ '.popover-body': content });
+      }
     }
   });
 
