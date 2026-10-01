@@ -10,6 +10,18 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
         <script src="https://kit.fontawesome.com/eb458e1abe.js" crossorigin="anonymous"></script>
         <script src="translations.js"></script>
+        <?php
+			function validation($data) {
+				$data = trim($data);
+				$data = stripslashes($data);
+				$data = htmlspecialchars($data);
+				return $data;
+			}
+
+			use PHPMailer\PHPMailer\PHPMailer;
+            use PHPMailer\PHPMailer\SMTP;
+			use PHPMailer\PHPMailer\Exception;
+		?>
     </head>
     <body style="background-image: url('assets/bg.jpg'); background-position: center center; background-size: cover; background-repeat: no-repeat; background-attachment: fixed; min-height: 100vh;">
         <nav class="navbar sticky-top navbar-expand-md bg-body-tertiary bg-opacity-75 py-0 mb-3">
@@ -71,7 +83,7 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        <form id="contactForm" method="post">
+                        <form id="contactForm" action="contacts.php" method="post">
                             <div class="mb-3">
                                 <label for="name" class="form-label" data-i18n="contacts.name">
                                     Name
@@ -155,67 +167,73 @@
             // Initialize Bootstrap popovers
             const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
             const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl, {trigger: 'focus'}));
-
-            // Handle form submission through email endpoint
+        </script>
+        <?php
+            // Handle form submission and send email using PHPMailer
             // REMEMBER: 
             // - Disable 2 factor auth on serving Google account
             // - Enable less secure app access
-            document.getElementById('contactForm').addEventListener('submit', async function (e) {
-                e.preventDefault();
+            // - customize the SMTP settings in the code below with your own credentials (stored in conf.php)
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $name = validation($_POST["name"]);
+                $surname = validation($_POST["surname"]);
+                $host = validation($_POST["host"]);
+                $domain = validation($_POST["domain"]);
+                $mailFrom = "$host@$domain";
+                $prefix = validation($_POST["prefix"]);
+                $number = validation($_POST["number"]);
+                $phoneNumber = "$prefix $number";
+                $message = validation($_POST["message"]);
 
-                const form = e.currentTarget;
-                const name = document.getElementById('name').value.trim();
-                const surname = document.getElementById('surname').value.trim();
-                const host = document.getElementById('host').value.trim();
-                const domain = document.getElementById('domain').value.trim();
-                const mailFrom = `${host}@${domain}`;
-                const prefix = document.getElementById('prefix').value;
-                const number = document.getElementById('number').value.trim();
-                const phoneNumber = `${prefix} ${number}`;
-                const message = document.getElementById('message').value.trim();
+                // Send email using PHPMailer
+                // Load Composer's autoloader (created by composer, not included with PHPMailer)
+                // require 'vendor/autoload.php';
+                require 'PHPMailer\Exception.php';
+				require 'PHPMailer\PHPMailer.php';
+				require 'PHPMailer\SMTP.php';
+                include 'conf.php';
 
-                const payload = {
-                    name,
-                    surname,
-                    email: mailFrom,
-                    phone: phoneNumber,
-                    message,
-                    _subject: 'Website contact',
-                    _captcha: 'false',
-                    _template: 'table'
-                };
-
+                $mail = new PHPMailer(true);
                 try {
-                    const response = await fetch('https://formsubmit.co/ajax/emanuele.snidero@gmail.com', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
+                    //Server settings
+                    $mail->SMTPDebug = 0; // Set as '2' to enable verbose debug output
+                    $mail->isSMTP(); // Send using SMTP
+                    $mail->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
+                    $mail->SMTPAuth   = true; // Enable SMTP authentication
+                    $mail->Username   = $mail_account_username; // SMTP username from conf.php
+                    $mail->Password   = $mail_account_password; // SMTP password from conf.php
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Enable implicit TLS encryption
+                    $mail->Port       = 587; // TCP port to connect to; use 587 for TLS, 465 for SSL
 
-                    if (!response.ok) {
-                        throw new Error('Request failed');
-                    }
+                    //Recipients
+                    $mail->setFrom($mail_account_username, 'Freschi Gmail SMTP server');
+                    $mail->addAddress('info@freschi.org', 'Freschi.org'); // (name is optional)
 
-                    alert('Message sent successfully. Thanks for contacting us!');
-                    form.reset();
-                } catch (error) {
-                    console.error('Contact form send failed:', error);
-                    const fallbackBody =
-                        `${message}\n\n` +
-                        `---\n` +
-                        `Name: ${name}\n` +
-                        `Surname: ${surname}\n` +
-                        `Phone: ${phoneNumber}\n` +
-                        `Email: ${mailFrom}`;
+                    //Content
+                    $mail->isHTML(true); // Set email format to HTML
+                    $mail->Subject = 'Website contact';
+                    $mail->Body    = "
+                        <p><strong>Name:</strong> $name</p>
+                        <p><strong>Surname:</strong> $surname</p>
+                        <p><strong>Phone:</strong> $phoneNumber</p>
+                        <p><strong>Email:</strong> $mailFrom</p>
+                        <hr>
+                        <p><strong>Message:</strong></p>
+                        <p>$message</p>
+                    ";
+                    $mail->AltBody = 'Name: ' . $name . "\n" .
+                                     'Surname: ' . $surname . "\n" .
+                                     'Phone: ' . $phoneNumber . "\n" .
+                                     'Email: ' . $mailFrom . "\n\n" .
+                                     '--------------------' . "\n\n" .
+                                     'Message:' . "\n" . $message;
 
-                    window.location.href =
-                        'mailto:info@freschi.org' +
-                        '?subject=' + encodeURIComponent('Website contact') +
-                        '&body=' + encodeURIComponent(fallbackBody);
+                    $mail->send();
+                    echo '<div class="alert alert-success" role="alert">Message sent successfully. Thanks for contacting us!</div>';
+                } catch (Exception $e) {
+                    echo '<div class="alert alert-danger" role="alert">Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '</div>';
                 }
-            });
-        </script>
+            }
+        ?>
+    </body>
 </html>
