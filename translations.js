@@ -59,6 +59,9 @@ const translations = {
     "contacts.successAlert": "Message sent successfully. Thanks for contacting us!",
     "contacts.errorAlert": "An error occurred while sending the message. Please try again later or contact us directly using footer details.",
 
+    "form.required": "Please fill out this field.",
+    "form.invalidEmail": "Please enter a valid email address.",
+
     "footer.mobile": "mobile",
     "footer.fax": "tel./fax",
     "footer.mail": "mail",
@@ -130,6 +133,9 @@ const translations = {
     "contacts.successAlert": "Messaggio correttamente inviato. Grazie per averci contattato!",
     "contacts.errorAlert": "Si è verificato un errore durante l'invio del messaggio. Per favore, riprova più tardi o contattaci direttamente utilizzando i dettagli a pié di pagina.",
 
+    "form.required": "Compila questo campo.",
+    "form.invalidEmail": "Inserisci un indirizzo email valido.",
+
     "footer.mobile": "cellulare",
     "footer.fax": "tel./fax",
     "footer.mail": "mail",
@@ -149,6 +155,20 @@ const defaultLanguage = 'it';
 function getSavedLanguage() {
   const saved = localStorage.getItem(languageStorageKey);
   return saved && translations[saved] ? saved : defaultLanguage;
+}
+
+function updateFormValidationMessages(language) {
+  const messages = translations[language];
+
+  document.querySelectorAll('input, select, textarea').forEach((field) => {
+    if (field.validity.valueMissing) {
+      field.setCustomValidity(messages['form.required']);
+    } else if (field.validity.typeMismatch && field.type === 'email') {
+      field.setCustomValidity(messages['form.invalidEmail']);
+    } else {
+      field.setCustomValidity('');
+    }
+  });
 }
 
 function applyLanguage(language) {
@@ -202,6 +222,8 @@ function applyLanguage(language) {
     button.setAttribute('aria-pressed', String(isActive));
   });
 
+  updateFormValidationMessages(selectedLanguage);
+
   localStorage.setItem(languageStorageKey, selectedLanguage);
 }
 
@@ -210,6 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
     button.addEventListener('click', () => {
       applyLanguage(button.dataset.langToggle);
     });
+  });
+
+  document.addEventListener('input', () => {
+    updateFormValidationMessages(getSavedLanguage());
+  });
+  document.addEventListener('change', () => {
+    updateFormValidationMessages(getSavedLanguage());
   });
 
   applyLanguage(getSavedLanguage());
