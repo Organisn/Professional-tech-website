@@ -75,8 +75,8 @@
             </div>
         </nav>
         <div class="container d-flex align-items-center min-vh-100 m-auto">
-            <div class="alert alert-success" role="alert" id="successAlert" style="display: none;">Message sent successfully. Thanks for contacting us!</div>
-            <div class="alert alert-danger" role="alert" id="errorAlert" style="display: none;"></div>
+            <div class="alert alert-success align-self-top" role="alert" id="successAlert" style="display: none;">Message sent successfully. Thanks for contacting us!</div>
+            <div class="alert alert-danger align-self-top" role="alert" id="errorAlert" style="display: none;"></div>
             <div class="container w-auto p-5 pt-4 bg-white bg-opacity-75 rounded-5">
                 <div class="row text-center">
                     <div class="col">
@@ -102,13 +102,7 @@
                                 <label for="mail" class="form-label" data-i18n="contacts.email">
                                     Email address
                                 </label>
-                                <div class="input-group" id="mail">
-                                    <input type="text" class="form-control" id="host" name="host" aria-label="host" data-i18n-attr="aria-label:contacts.host" required>
-                                    <span class="input-group-text">
-                                        @
-                                    </span>
-                                    <input type="text" class="form-control" id="domain" name="domain" aria-label="domain" placeholder="domain.com" data-i18n-placeholder="contacts.domainPlaceholder" data-i18n-attr="aria-label:contacts.domain" required>
-                                </div>
+                                <input type="email" class="form-control" id="mail" name="mail" placeholder="host@domain.com" data-i18n-placeholder="contacts.domainPlaceholder"required>
                             </div>
                             <div class="mb-3">
                                 <label for="phone" class="form-label" data-i18n="contacts.phone">
@@ -179,9 +173,7 @@
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $name = validation($_POST["name"]);
                 $surname = validation($_POST["surname"]);
-                $host = validation($_POST["host"]);
-                $domain = validation($_POST["domain"]);
-                $mailFrom = "$host@$domain";
+                $mailFrom = validation($_POST["mail"]);;
                 $prefix = validation($_POST["prefix"]);
                 $number = validation($_POST["number"]);
                 $phoneNumber = "$prefix $number";
