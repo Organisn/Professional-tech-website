@@ -201,7 +201,7 @@
 
                     //Recipients
                     $mail->setFrom($mail_account_username, 'Freschi SMTP server');
-                    $mail->addAddress('info@freschi.org', 'Freschi.org'); // (name is optional)
+                    $mail->addAddress('info@freschi.org'); // (name is optional)
 
                     //Content
                     $mail->isHTML(true); // Set email format to HTML
@@ -231,8 +231,9 @@
                     echo '<script>
                     document.getElementById("successAlert").style.display = "none";
                     document.getElementById("errorAlert").style.display = "block";
+                    console.error(' . json_encode("Message could not be sent. Mailer Error: {$mail->ErrorInfo}") . ');
                     </script>';
-                    error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+                    error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}", 0);
                 }
             }
         ?>
