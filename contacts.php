@@ -232,6 +232,7 @@
                     document.getElementById("successAlert").style.display = "none";
                     document.getElementById("errorAlert").style.display = "block";
                     </script>';
+                    error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
                 }
             }
         ?>
