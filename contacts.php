@@ -74,9 +74,9 @@
                 </div>
             </div>
         </nav>
-        <div class="container d-flex align-items-center min-vh-100 m-auto">
-            <div class="alert alert-success align-self-top" role="alert" id="successAlert" style="display: none;">Message sent successfully. Thanks for contacting us!</div>
-            <div class="alert alert-danger align-self-top" role="alert" id="errorAlert" style="display: none;"></div>
+        <div class="container d-flex flex-column align-items-center min-vh-100 m-auto">
+            <div class="alert alert-success" role="alert" id="successAlert" style="display: none;">Message sent successfully. Thanks for contacting us!</div>
+            <div class="alert alert-danger" role="alert" id="errorAlert" style="display: none;"></div>
             <div class="container w-auto p-5 pt-4 bg-white bg-opacity-75 rounded-5">
                 <div class="row text-center">
                     <div class="col">
