@@ -56,6 +56,8 @@ const translations = {
     "contacts.submit": "Submit",
     "contacts.prev": "Previous",
     "contacts.next": "Next",
+    "contacts.successAlert": "Message sent successfully. Thanks for contacting us!",
+    "contacts.errorAlert": "An error occurred while sending the message. Please try again later or contact us directly using footer details.",
 
     "footer.mobile": "mobile",
     "footer.fax": "tel./fax",
@@ -125,6 +127,8 @@ const translations = {
     "contacts.submit": "Invia",
     "contacts.prev": "Precedente",
     "contacts.next": "Successivo",
+    "contacts.successAlert": "Messaggio correttamente inviato. Grazie per averci contattato!",
+    "contacts.errorAlert": "Si è verificato un errore durante l'invio del messaggio. Per favore, riprova più tardi o contattaci direttamente utilizzando i dettagli a pié di pagina.",
 
     "footer.mobile": "cellulare",
     "footer.fax": "tel./fax",
