@@ -192,15 +192,15 @@
                     //Server settings
                     $mail->SMTPDebug = 0; // Set as '2' to enable verbose debug output
                     $mail->isSMTP(); // Send using SMTP
-                    $mail->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
+                    $mail->Host       = $mail_account_host; // Set the SMTP server to send through
                     $mail->SMTPAuth   = true; // Enable SMTP authentication
                     $mail->Username   = $mail_account_username; // SMTP username from conf.php
                     $mail->Password   = $mail_account_password; // SMTP password from conf.php
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Enable implicit TLS encryption
-                    $mail->Port       = 587; // TCP port to connect to; use 587 for TLS, 465 for SSL
+                    $mail->Port       = $mail_account_port; // TCP port to connect to; use 587 for TLS, 465 for SSL
 
                     //Recipients
-                    $mail->setFrom($mail_account_username, 'Freschi Gmail SMTP server');
+                    $mail->setFrom($mail_account_username, 'Freschi SMTP server');
                     $mail->addAddress('info@freschi.org', 'Freschi.org'); // (name is optional)
 
                     //Content
