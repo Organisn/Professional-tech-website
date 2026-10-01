@@ -75,6 +75,8 @@
             </div>
         </nav>
         <div class="container d-flex align-items-center min-vh-100 m-auto">
+            <div class="alert alert-success" role="alert" id="successAlert" style="display: none;">Message sent successfully. Thanks for contacting us!</div>
+            <div class="alert alert-danger" role="alert" id="errorAlert" style="display: none;"></div>
             <div class="container w-auto p-5 pt-4 bg-white bg-opacity-75 rounded-5">
                 <div class="row text-center">
                     <div class="col">
@@ -229,9 +231,17 @@
                                      'Message:' . "\n" . $message;
 
                     $mail->send();
-                    echo '<div class="alert alert-success" role="alert">Message sent successfully. Thanks for contacting us!</div>';
+                    echo '<script>
+                    document.getElementById("errorAlert").style.display = "none";
+                    document.getElementById("successAlert").style.display = "block";
+                    </script>';
                 } catch (Exception $e) {
-                    echo '<div class="alert alert-danger" role="alert">Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '</div>';
+                    echo '<script>
+                    document.getElementById("successAlert").style.display = "none";
+                    const errorAlert = document.getElementById("errorAlert");
+                    errorAlert.innerHTML = "Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '";
+                    document.getElementById("errorAlert").style.display = "block";
+                    </script>';
                 }
             }
         ?>
