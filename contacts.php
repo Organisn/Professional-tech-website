@@ -36,15 +36,28 @@
                 </button>
                 <!--<div class="collapse navbar-collapse h-100" id="navbar">
                     <div class="navbar-nav h-100">
-                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="about.html" data-i18n="nav.about">About</a>
-                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="services.html" data-i18n="nav.services">Services</a>
-                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="supplies.html" data-i18n="nav.supplies">Supplies</a>
-                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="index.html" data-i18n="nav.solutions">Solutions</a>
+                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="about.html" data-i18n="nav.about">
+                            About
+                        </a>
+                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="services.html" data-i18n="nav.services">
+                            Services
+                        </a>
+                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="supplies.html" data-i18n="nav.supplies">
+                            Supplies
+                        </a>
+                        <a class="btn btn-outline-dark h-md-100 px-3 fs-5 text-nowrap border-0 rounded-0 d-flex align-items-center justify-content-center" href="index.html" data-i18n="nav.solutions">
+                            Solutions
+                        </a>
                     </div>
                     <div class="d-flex align-items-center ms-auto me-3 gap-1">
-                        <button type="button" class="btn btn-sm btn-outline-dark border-0 px-2" style="width: 40px;" data-lang-toggle="en" data-i18n="lang.en">EN</button>
-                        <button type="button" class="btn btn-sm btn-outline-dark border-0 px-2" style="width: 40px;" data-lang-toggle="it" data-i18n="lang.it">IT</button>
-                    </div>-->
+                        <button type="button" class="btn btn-sm btn-outline-dark border-0 px-2" style="width: 40px;" data-lang-toggle="en" data-i18n="lang.en">
+                            EN
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-dark border-0 px-2" style="width: 40px;" data-lang-toggle="it" data-i18n="lang.it">
+                            IT
+                        </button>
+                    </div>
+                </div>-->
                 <div class="collapse navbar-collapse h-100" id="navbar">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item h-100 d-flex align-items-center justify-content-center">
