@@ -194,60 +194,96 @@
                 $message = validation($_POST["message"]);
 
                 // Send email using PHPMailer
-                // Load Composer's autoloader (created by composer, not included with PHPMailer)
-                // require 'vendor/autoload.php';
-                require 'PHPMailer\Exception.php';
-				require 'PHPMailer\PHPMailer.php';
-				require 'PHPMailer\SMTP.php';
-                include 'conf.php';
-
-                $mail = new PHPMailer(true);
-                try {
-                    //Server settings
-                    $mail->SMTPDebug = 0; // Set as '2' to enable verbose debug output
-                    $mail->isSMTP(); // Send using SMTP
-                    $mail->Host       = $mail_account_host; // Set the SMTP server to send through
-                    $mail->SMTPAuth   = true; // Enable SMTP authentication
-                    $mail->Username   = $mail_account_username; // SMTP username from conf.php
-                    $mail->Password   = $mail_account_password; // SMTP password from conf.php
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Enable implicit TLS encryption
-                    $mail->Port       = $mail_account_port; // TCP port to connect to; use 587 for TLS, 465 for SSL
-
-                    //Recipients
-                    $mail->setFrom($mail_account_username, 'Freschi SMTP server');
-                    $mail->addAddress('info@freschi.org'); // (name is optional)
-
-                    //Content
-                    $mail->isHTML(true); // Set email format to HTML
-                    $mail->Subject = 'Website contact';
-                    $mail->Body    = "
-                        <p><strong>Name:</strong> $name</p>
-                        <p><strong>Surname:</strong> $surname</p>
-                        <p><strong>Phone:</strong> $phoneNumber</p>
-                        <p><strong>Email:</strong> $mailFrom</p>
-                        <hr>
-                        <p><strong>Message:</strong></p>
-                        <p>$message</p>
-                    ";
-                    $mail->AltBody = 'Name: ' . $name . "\n" .
-                                     'Surname: ' . $surname . "\n" .
-                                     'Phone: ' . $phoneNumber . "\n" .
-                                     'Email: ' . $mailFrom . "\n\n" .
-                                     '--------------------' . "\n\n" .
-                                     'Message:' . "\n" . $message;
-
-                    $mail->send();
-                    echo '<script>
-                    document.getElementById("errorAlert").style.display = "none";
-                    document.getElementById("successAlert").style.display = "block";
-                    </script>';
-                } catch (Exception $e) {
+                // First, check if the required PHPMailer and smtp config files exist before including them
+                // (with DIR const paths syntax is portable over Windows and Linux servers)
+                $exceptionPath = __DIR__ . '/PHPMailer/Exception.php';
+                $phpMailerPath = __DIR__ . '/PHPMailer/PHPMailer.php';
+                $smtpPath = __DIR__ . '/PHPMailer/SMTP.php';
+                $confPath = __DIR__ . '/conf.php';
+                if (!file_exists($exceptionPath) || !file_exists($phpMailerPath) || !file_exists($smtpPath) || !file_exists($confPath)) {
                     echo '<script>
                     document.getElementById("successAlert").style.display = "none";
                     document.getElementById("errorAlert").style.display = "block";
-                    console.error(' . json_encode("Message could not be sent. Mailer Error: {$mail->ErrorInfo}") . ');
                     </script>';
-                    error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}", 0);
+                    if (!file_exists($exceptionPath)) {
+                        echo '<script>
+                        console.error(' . json_encode("Errore critico: Il file " . $exceptionPath . " non è stato trovato sul server.") . ');
+                        </script>';
+                        error_log("Errore critico: Il file " . $exceptionPath . " non è stato trovato sul server.", 0);
+                    }
+                    if (!file_exists($phpMailerPath)) {
+                        echo '<script>
+                        console.error(' . json_encode("Errore critico: Il file " . $phpMailerPath . " non è stato trovato sul server.") . ');
+                        </script>';
+                        error_log("Errore critico: Il file " . $phpMailerPath . " non è stato trovato sul server.", 0);
+                    }
+                    if (!file_exists($smtpPath)) {
+                        echo '<script>
+                        console.error(' . json_encode("Errore critico: Il file " . $smtpPath . " non è stato trovato sul server.") . ');
+                        </script>';
+                        error_log("Errore critico: Il file " . $smtpPath . " non è stato trovato sul server.", 0);
+                    }
+                    if (!file_exists($confPath)) {
+                        echo '<script>
+                        console.error(' . json_encode("Errore critico: Il file " . $confPath . " non è stato trovato sul server.") . ');
+                        </script>';
+                        error_log("Errore critico: Il file " . $confPath . " non è stato trovato sul server.", 0);
+                    }
+                } else {
+                    // All required files exist, proceed to include them
+                    include $exceptionPath;
+                    include $phpMailerPath;
+                    include $smtpPath;
+                    include $confPath;
+
+                    // Compose and send the email using PHPMailer
+                    $mail = new PHPMailer(true);
+                    try {
+                        //Server settings
+                        $mail->SMTPDebug = 0; // Set as '2' to enable verbose debug output
+                        $mail->isSMTP(); // Send using SMTP
+                        $mail->Host       = $mail_account_host; // Set the SMTP server to send through
+                        $mail->SMTPAuth   = true; // Enable SMTP authentication
+                        $mail->Username   = $mail_account_username; // SMTP username from conf.php
+                        $mail->Password   = $mail_account_password; // SMTP password from conf.php
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Enable implicit TLS encryption
+                        $mail->Port       = $mail_account_port; // TCP port to connect to; use 587 for TLS, 465 for SSL
+
+                        //Recipients
+                        $mail->setFrom($mail_account_username, 'Freschi SMTP server');
+                        $mail->addAddress('info@freschi.org'); // (name is optional)
+
+                        //Content
+                        $mail->isHTML(true); // Set email format to HTML
+                        $mail->Subject = 'Website contact';
+                        $mail->Body    = "
+                            <p><strong>Name:</strong> $name</p>
+                            <p><strong>Surname:</strong> $surname</p>
+                            <p><strong>Phone:</strong> $phoneNumber</p>
+                            <p><strong>Email:</strong> $mailFrom</p>
+                            <hr>
+                            <p><strong>Message:</strong></p>
+                            <p>$message</p>
+                        ";
+                        $mail->AltBody = 'Name: ' . $name . "\n" .
+                                        'Surname: ' . $surname . "\n" .
+                                        'Phone: ' . $phoneNumber . "\n" .
+                                        'Email: ' . $mailFrom . "\n\n" .
+                                        '--------------------' . "\n\n" .
+                                        'Message:' . "\n" . $message;
+                        $mail->send();
+                        echo '<script>
+                        document.getElementById("errorAlert").style.display = "none";
+                        document.getElementById("successAlert").style.display = "block";
+                        </script>';
+                    } catch (Exception $e) {
+                        echo '<script>
+                        document.getElementById("successAlert").style.display = "none";
+                        document.getElementById("errorAlert").style.display = "block";
+                        console.error(' . json_encode("Message could not be sent. Mailer Error: {$mail->ErrorInfo}") . ');
+                        </script>';
+                        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}", 0);
+                    }
                 }
             }
         ?>
