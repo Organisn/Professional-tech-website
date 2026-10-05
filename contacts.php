@@ -26,7 +26,7 @@
     <body style="background-image: url('assets/bg.jpg'); background-position: center center; background-size: cover; background-repeat: no-repeat; background-attachment: fixed; min-height: 100vh;">
         <nav class="navbar sticky-top navbar-expand-md bg-body-tertiary bg-opacity-75 py-0 mb-3">
             <div class="container-fluid align-self-stretch">
-                <a class="navbar-brand d-flex align-items-center my-2 ms-3" href="homeIndex.html">
+                <a class="navbar-brand d-flex align-items-center my-2 ms-3" href="home.html">
                     <i class="fa-solid fa-cow fa-2x d-inline-block" alt="FA"></i>
                     <!-- <img src="assets/logo.ico" class="img-fluid d-inline-block float-start" style="max-height: 3rem;">
                     <p class="d-inline-block fs-3 m-0 ms-3"><em>FA</em></p> -->
