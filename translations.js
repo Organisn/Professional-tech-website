@@ -35,9 +35,9 @@ const translations = {
     "supplies.cleaning": "Cleaning",
     "supplies.working": "Working on it. Be ready...",
 
-    "solutions.heading": "Developed Solutions",
+    "solutions.heading": "Fastboard",
     "solutions.fastboardTitle": "FastBoard",
-    "solutions.fastboardText1": "Wanna build cages in just few clicks? Consider implementing your layout with FastBoard, the PVC modular panel system meant to easily be assembled and joined together.",
+    "solutions.fastboardText1": "Wanna build protections in just few clicks? Consider implementing your layout with FastBoard, the PVC modular panel system meant to easily be assembled and joined together.",
     "solutions.fastboardText2": "Wanna start designing your cage?",
     "solutions.contactLink": "Contact me.",
 
@@ -109,9 +109,9 @@ const translations = {
     "supplies.cleaning": "Pulizia",
     "supplies.working": "Stiamo lavorando su questo contenuto. Stai pronto...",
 
-    "solutions.heading": "Soluzioni sviluppate",
+    "solutions.heading": "Fastboard",
     "solutions.fastboardTitle": "FastBoard",
-    "solutions.fastboardText1": "Vuoi costruire recinti in pochi clic? Considera l'implementazione del tuo layout con FastBoard, il sistema modulare in PVC pensato per essere montato e assemblato in modo semplice e rapido.",
+    "solutions.fastboardText1": "Vuoi costruire protezioni in pochi clic? Considera l'implementazione del tuo layout con FastBoard, il sistema modulare in PVC pensato per essere montato e assemblato in modo semplice e rapido.",
     "solutions.fastboardText2": "Vuoi iniziare a progettare il tuo box?",
     "solutions.contactLink": "Contattami.",
 
