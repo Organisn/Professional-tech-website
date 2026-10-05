@@ -6,5 +6,5 @@
     } else { 
         echo "OpenSSL NON è abilitato nel file php.ini\n\n\n"; 
     }
-    //phpinfo();
+    phpinfo();
 ?>
