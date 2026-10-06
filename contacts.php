@@ -213,144 +213,150 @@
                     document.getElementById("botErrorAlert").style.display = "none";
                     </script>';
                 } else {
-                    // Check the Turnstile token by sending a POST request to Cloudflare
-                    $data = [
-                        'secret'   => "turnstile_secret_key", // Replace with your actual secret key from conf.php
-                        'response' => $turnstileResponse,
-                        'remoteip' => $_SERVER['REMOTE_ADDR']
-                    ];
+                    // Include the conf.php file to get the SMTP server credentials and Turnstile secret key
+                    $confPath = __DIR__ . '/conf.php';
+                    if (!file_exists($confPath)) {
+                        echo '<script>
+                        document.getElementById("successAlert").style.display = "none";
+                        document.getElementById("errorAlert").style.display = "block";
+                        document.getElementById("warningAlert").style.display = "none";
+                        document.getElementById("botErrorAlert").style.display = "none";
+                        console.error(' . json_encode("Errore critico: Il file " . $confPath . " non è stato trovato sul server.") . ');
+                        </script>';
+                        error_log("Errore critico: Il file " . $confPath . " non è stato trovato sul server.", 0);
+                    } else {
+                        include $confPath;
+                        // Check the Turnstile token by sending a POST request to Cloudflare
+                        $data = [
+                            'secret'   => $turnstile_secret_key,
+                            'response' => $turnstileResponse,
+                            'remoteip' => $_SERVER['REMOTE_ADDR']
+                        ];
 
-                    $options = [
-                        'http' => [
-                            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                            'method'  => 'POST',
-                            'content' => http_build_query($data)
-                        ]
-                    ];
+                        $options = [
+                            'http' => [
+                                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                                'method'  => 'POST',
+                                'content' => http_build_query($data)
+                            ]
+                        ];
 
-                    $context  = stream_context_create($options);
-                    $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-                    $result   = file_get_contents($url, false, $context);
-                    $response = json_decode($result, true);
+                        $context  = stream_context_create($options);
+                        $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+                        $result   = file_get_contents($url, false, $context);
+                        $response = json_decode($result, true);
 
-                    // Check:
-                    // - the response from Cloudflare to determine if the user is a human or a bot
-                    // - the honeypot field to ensure it's empty (as a plausible human user should leave it)
-                    if ($response && isset($response['success']) && $response['success'] === true && empty($_POST['honeypot_check'])) {
-                        $name = validation($_POST["name"]);
-                        $surname = validation($_POST["surname"]);
-                        $mailFrom = validation($_POST["mail"]);;
-                        $prefix = validation($_POST["prefix"]);
-                        $number = validation($_POST["number"]);
-                        $phoneNumber = "$prefix $number";
-                        $message = validation($_POST["message"]);
+                        // Check:
+                        // - the response from Cloudflare to determine if the user is a human or a bot
+                        // - the honeypot field to ensure it's empty (as a plausible human user should leave it)
+                        if ($response && isset($response['success']) && $response['success'] === true && empty($_POST['honeypot_check'])) {
+                            $name = validation($_POST["name"]);
+                            $surname = validation($_POST["surname"]);
+                            $mailFrom = validation($_POST["mail"]);;
+                            $prefix = validation($_POST["prefix"]);
+                            $number = validation($_POST["number"]);
+                            $phoneNumber = "$prefix $number";
+                            $message = validation($_POST["message"]);
 
-                        // Send email using PHPMailer
-                        // First, check if the required PHPMailer and smtp config files exist before including them
-                        // (with DIR const paths syntax is portable over Windows and Linux servers)
-                        $exceptionPath = __DIR__ . '/PHPMailer/Exception.php';
-                        $phpMailerPath = __DIR__ . '/PHPMailer/PHPMailer.php';
-                        $smtpPath = __DIR__ . '/PHPMailer/SMTP.php';
-                        $confPath = __DIR__ . '/conf.php';
-                        if (!file_exists($exceptionPath) || !file_exists($phpMailerPath) || !file_exists($smtpPath) || !file_exists($confPath)) {
-                            echo '<script>
-                            document.getElementById("successAlert").style.display = "none";
-                            document.getElementById("errorAlert").style.display = "block";
-                            document.getElementById("warningAlert").style.display = "none";
-                            document.getElementById("botErrorAlert").style.display = "none";
-                            </script>';
-                            if (!file_exists($exceptionPath)) {
-                                echo '<script>
-                                console.error(' . json_encode("Errore critico: Il file " . $exceptionPath . " non è stato trovato sul server.") . ');
-                                </script>';
-                                error_log("Errore critico: Il file " . $exceptionPath . " non è stato trovato sul server.", 0);
-                            }
-                            if (!file_exists($phpMailerPath)) {
-                                echo '<script>
-                                console.error(' . json_encode("Errore critico: Il file " . $phpMailerPath . " non è stato trovato sul server.") . ');
-                                </script>';
-                                error_log("Errore critico: Il file " . $phpMailerPath . " non è stato trovato sul server.", 0);
-                            }
-                            if (!file_exists($smtpPath)) {
-                                echo '<script>
-                                console.error(' . json_encode("Errore critico: Il file " . $smtpPath . " non è stato trovato sul server.") . ');
-                                </script>';
-                                error_log("Errore critico: Il file " . $smtpPath . " non è stato trovato sul server.", 0);
-                            }
-                            if (!file_exists($confPath)) {
-                                echo '<script>
-                                console.error(' . json_encode("Errore critico: Il file " . $confPath . " non è stato trovato sul server.") . ');
-                                </script>';
-                                error_log("Errore critico: Il file " . $confPath . " non è stato trovato sul server.", 0);
-                            }
-                        } else {
-                            // All required files exist, proceed to include them
-                            include $exceptionPath;
-                            include $phpMailerPath;
-                            include $smtpPath;
-                            include $confPath;
-
-                            // Compose and send the email using PHPMailer
-                            $mail = new PHPMailer(true);
-                            try {
-                                //Server settings
-                                $mail->SMTPDebug = 0; // Set as '2' to enable verbose debug output
-                                $mail->isSMTP(); // Send using SMTP
-                                $mail->Host       = $mail_account_host; // Set the SMTP server to send through
-                                $mail->SMTPAuth   = true; // Enable SMTP authentication
-                                $mail->Username   = $mail_account_username; // SMTP username from conf.php
-                                $mail->Password   = $mail_account_password; // SMTP password from conf.php
-                                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Enable implicit TLS encryption
-                                $mail->Port       = $mail_account_port; // TCP port to connect to; use 587 for TLS, 465 for SSL
-
-                                //Recipients
-                                $mail->setFrom($mail_account_username, 'Freschi SMTP server');
-                                $mail->addAddress('info@freschi.org'); // (name is optional)
-
-                                //Content
-                                $mail->isHTML(true); // Set email format to HTML
-                                $mail->Subject = 'Website contact';
-                                $mail->Body    = "
-                                    <p><strong>Name:</strong> $name</p>
-                                    <p><strong>Surname:</strong> $surname</p>
-                                    <p><strong>Phone:</strong> $phoneNumber</p>
-                                    <p><strong>Email:</strong> $mailFrom</p>
-                                    <hr>
-                                    <p><strong>Message:</strong></p>
-                                    <p>$message</p>
-                                ";
-                                $mail->AltBody = 'Name: ' . $name . "\n" .
-                                                'Surname: ' . $surname . "\n" .
-                                                'Phone: ' . $phoneNumber . "\n" .
-                                                'Email: ' . $mailFrom . "\n\n" .
-                                                '--------------------' . "\n\n" .
-                                                'Message:' . "\n" . $message;
-                                $mail->send();
-                                echo '<script>
-                                document.getElementById("errorAlert").style.display = "none";
-                                document.getElementById("successAlert").style.display = "block";
-                                document.getElementById("warningAlert").style.display = "none";
-                                document.getElementById("botErrorAlert").style.display = "none";
-                                </script>';
-                            } catch (Exception $e) {
+                            // Send email using PHPMailer
+                            // First, check if the required PHPMailer files exist before including them
+                            // (with DIR const paths syntax is portable over Windows and Linux servers)
+                            $exceptionPath = __DIR__ . '/PHPMailer/Exception.php';
+                            $phpMailerPath = __DIR__ . '/PHPMailer/PHPMailer.php';
+                            $smtpPath = __DIR__ . '/PHPMailer/SMTP.php';
+                            if (!file_exists($exceptionPath) || !file_exists($phpMailerPath) || !file_exists($smtpPath)) {
                                 echo '<script>
                                 document.getElementById("successAlert").style.display = "none";
                                 document.getElementById("errorAlert").style.display = "block";
                                 document.getElementById("warningAlert").style.display = "none";
                                 document.getElementById("botErrorAlert").style.display = "none";
-                                console.error(' . json_encode("Message could not be sent. Mailer Error: {$mail->ErrorInfo}") . ');
                                 </script>';
-                                error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}", 0);
+                                if (!file_exists($exceptionPath)) {
+                                    echo '<script>
+                                    console.error(' . json_encode("Errore critico: Il file " . $exceptionPath . " non è stato trovato sul server.") . ');
+                                    </script>';
+                                    error_log("Errore critico: Il file " . $exceptionPath . " non è stato trovato sul server.", 0);
+                                }
+                                if (!file_exists($phpMailerPath)) {
+                                    echo '<script>
+                                    console.error(' . json_encode("Errore critico: Il file " . $phpMailerPath . " non è stato trovato sul server.") . ');
+                                    </script>';
+                                    error_log("Errore critico: Il file " . $phpMailerPath . " non è stato trovato sul server.", 0);
+                                }
+                                if (!file_exists($smtpPath)) {
+                                    echo '<script>
+                                    console.error(' . json_encode("Errore critico: Il file " . $smtpPath . " non è stato trovato sul server.") . ');
+                                    </script>';
+                                    error_log("Errore critico: Il file " . $smtpPath . " non è stato trovato sul server.", 0);
+                                }
+                            } else {
+                                // All required files exist, proceed to include them
+                                include $exceptionPath;
+                                include $phpMailerPath;
+                                include $smtpPath;
+
+                                // Compose and send the email using PHPMailer
+                                $mail = new PHPMailer(true);
+                                try {
+                                    //Server settings
+                                    $mail->SMTPDebug = 0; // Set as '2' to enable verbose debug output
+                                    $mail->isSMTP(); // Send using SMTP
+                                    $mail->Host       = $mail_account_host; // Set the SMTP server to send through
+                                    $mail->SMTPAuth   = true; // Enable SMTP authentication
+                                    $mail->Username   = $mail_account_username; // SMTP username from conf.php
+                                    $mail->Password   = $mail_account_password; // SMTP password from conf.php
+                                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Enable implicit TLS encryption
+                                    $mail->Port       = $mail_account_port; // TCP port to connect to; use 587 for TLS, 465 for SSL
+
+                                    //Recipients
+                                    $mail->setFrom($mail_account_username, 'Freschi SMTP server');
+                                    $mail->addAddress('info@freschi.org'); // (name is optional)
+
+                                    //Content
+                                    $mail->isHTML(true); // Set email format to HTML
+                                    $mail->Subject = 'Website contact';
+                                    $mail->Body    = "
+                                        <p><strong>Name:</strong> $name</p>
+                                        <p><strong>Surname:</strong> $surname</p>
+                                        <p><strong>Phone:</strong> $phoneNumber</p>
+                                        <p><strong>Email:</strong> $mailFrom</p>
+                                        <hr>
+                                        <p><strong>Message:</strong></p>
+                                        <p>$message</p>
+                                    ";
+                                    $mail->AltBody = 'Name: ' . $name . "\n" .
+                                                    'Surname: ' . $surname . "\n" .
+                                                    'Phone: ' . $phoneNumber . "\n" .
+                                                    'Email: ' . $mailFrom . "\n\n" .
+                                                    '--------------------' . "\n\n" .
+                                                    'Message:' . "\n" . $message;
+                                    $mail->send();
+                                    echo '<script>
+                                    document.getElementById("errorAlert").style.display = "none";
+                                    document.getElementById("successAlert").style.display = "block";
+                                    document.getElementById("warningAlert").style.display = "none";
+                                    document.getElementById("botErrorAlert").style.display = "none";
+                                    </script>';
+                                } catch (Exception $e) {
+                                    echo '<script>
+                                    document.getElementById("successAlert").style.display = "none";
+                                    document.getElementById("errorAlert").style.display = "block";
+                                    document.getElementById("warningAlert").style.display = "none";
+                                    document.getElementById("botErrorAlert").style.display = "none";
+                                    console.error(' . json_encode("Message could not be sent. Mailer Error: {$mail->ErrorInfo}") . ');
+                                    </script>';
+                                    error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}", 0);
+                                }
                             }
+                        } else {
+                            // Turnstile validation failed
+                            echo '<script>
+                            document.getElementById("successAlert").style.display = "none";
+                            document.getElementById("errorAlert").style.display = "none";
+                            document.getElementById("warningAlert").style.display = "none";
+                            document.getElementById("botErrorAlert").style.display = "block";
+                            </script>';
                         }
-                    } else {
-                        // Turnstile validation failed
-                        echo '<script>
-                        document.getElementById("successAlert").style.display = "none";
-                        document.getElementById("errorAlert").style.display = "none";
-                        document.getElementById("warningAlert").style.display = "none";
-                        document.getElementById("botErrorAlert").style.display = "block";
-                        </script>';
                     }
                 }
             }
