@@ -58,6 +58,8 @@ const translations = {
     "contacts.next": "Next",
     "contacts.successAlert": "Message sent successfully. Thanks for contacting us!",
     "contacts.errorAlert": "An error occurred while sending the message. Please try again later or contact us directly using footer details.",
+    "contacts.warningAlert": "Please fill in all fields.",
+    "contacts.botErrorAlert": "You've been identified as a bot. Please try again later or contact us directly using footer details.",
 
     "form.required": "Please fill out this field.",
     "form.invalidEmail": "Please enter a valid email address.",
@@ -132,6 +134,8 @@ const translations = {
     "contacts.next": "Successivo",
     "contacts.successAlert": "Messaggio correttamente inviato. Grazie per averci contattato!",
     "contacts.errorAlert": "Si è verificato un errore durante l'invio del messaggio. Per favore, riprova più tardi o contattaci direttamente utilizzando i dettagli a pié di pagina.",
+    "contacts.warningAlert": "Per favore, compila tutti i campi.",
+    "contacts.botErrorAlert": "Sei stato identificato come bot. Per favore, riprova più tardi o contattaci direttamente utilizzando i dettagli a pié di pagina.",
 
     "form.required": "Compila questo campo.",
     "form.invalidEmail": "Inserisci un indirizzo email valido.",
