@@ -143,7 +143,7 @@
                                 <textarea class="form-control" id="message" name="message" rows="5" placeholder="Describe your project in detail..." data-i18n-placeholder="contacts.messagePlaceholder" required></textarea>
                             </div>
                             <!-- Turnstile widget (customize data-sitekey attribute) -->
-                            <div class="cf-turnstile mb-3" data-sitekey=""></div>
+                            <div class="cf-turnstile mb-2 ms-2" data-sitekey=""></div>
                             <!-- Bot-only visible field -->
                             <div class="d-none">
                                 <input type="text" name="honeypot_check" value="" tabindex="-1" autocomplete="off">
